@@ -41,7 +41,7 @@ struct TestVector2D : Vector {
     }
   }
   
-  init(splat: Float) {
+  init(repeating splat: Float) {
     x = splat
     y = splat
   }

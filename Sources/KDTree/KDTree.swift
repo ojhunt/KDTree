@@ -109,7 +109,7 @@ public final class KDTree<T: PositionedEntity> {
           top.bounds
         }
         if nearestElements.isFull {
-          let distance = T.VectorType(splat: nearestElements.sortedTop!.1);
+          let distance = T.VectorType(repeating: nearestElements.sortedTop!.1);
           let min = bounds.minBound - distance;
           let max = bounds.maxBound + distance;
           if (position .< min).any || (position .> max).any {
@@ -166,8 +166,8 @@ public final class KDTree<T: PositionedEntity> {
       }
       guard let distance = nearestElements.sortedTop?.1 else { fatalError() }
       let bounds = node._withUnsafeGuaranteedRef({ node in node.bounds });
-      let min = bounds.minBound - T.VectorType(splat: Swift.min(distance, maxDistanceSquared));
-      let max = bounds.maxBound + T.VectorType(splat: Swift.min(distance, maxDistanceSquared));
+      let min = bounds.minBound - T.VectorType(repeating: Swift.min(distance, maxDistanceSquared));
+      let max = bounds.maxBound + T.VectorType(repeating: Swift.min(distance, maxDistanceSquared));
       if (position .< min).any || (position .> max).any {
         continue stack_loop;
       }
