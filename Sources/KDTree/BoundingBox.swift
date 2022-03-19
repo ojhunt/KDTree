@@ -5,7 +5,9 @@
 //  Created by Oliver Hunt on 3/18/22.
 //
 
-public struct BoundingBox<PointType: Point> {
+import VectorTypes
+
+public struct BoundingBox<PointType: VectorTypes.Point> {
   typealias AxisType = PointType.AxisType
   
   public let minBound: PointType;

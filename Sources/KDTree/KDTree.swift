@@ -5,6 +5,12 @@
 //  Created by Oliver Hunt on 3/8/22.
 //
 import Foundation
+import VectorTypes
+
+public typealias Point = VectorTypes.Point
+public typealias Vector = VectorTypes.IndexableVector
+public typealias Mask = VectorTypes.Mask
+public typealias IterableAxis = VectorTypes.IterableAxis
 
 @usableFromInline internal struct ElementAccumulator<T, DistanceType: Comparable> {
   @usableFromInline struct DistanceComparator: PriorityComparator {
