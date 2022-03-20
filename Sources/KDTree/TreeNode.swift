@@ -4,6 +4,7 @@
 //
 //  Created by Oliver Hunt on 3/18/22.
 //
+import VectorTypes
 
 @usableFromInline internal enum Content<T: PositionedEntity> {
   case Leaf([T], BoundingBox<T.PointType>)

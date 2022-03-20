@@ -4,6 +4,7 @@
 //
 //  Created by Oliver Hunt on 3/19/22.
 //
+import VectorTypes
 
 @usableFromInline internal final class InnerNode<T: PositionedEntity> {
   internal init(children: (TreeNode<T>, TreeNode<T>), axis: T.AxisType, value: T.PointType.ValueType, bounds: BoundingBox<T.PointType>) {
