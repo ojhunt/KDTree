@@ -8,7 +8,7 @@
 import Foundation
 import VectorTypes
 
-public final class KDTree<T: PositionedEntity> where T.PointType.ValueType: Rootable {
+@frozen public struct KDTree<T: PositionedEntity> where T.PointType.ValueType: Rootable {
   public typealias DistanceType = T.PointType.ValueType
   @usableFromInline let root: TreeNode<T>
   
@@ -16,7 +16,7 @@ public final class KDTree<T: PositionedEntity> where T.PointType.ValueType: Root
     let bounds = elements.reduce(BoundingBox(), { result, element in return result.merge(point:element.position)})
     root = buildKDTree(elements: &elements, bounds: bounds, maxChildren: maxChildren)
   }
-  @inlinable public func nearest(
+  @inlinable @inline(__always) public func nearest(
     position: T.PointType,
     maxCount: Int,
     maxDistance: DistanceType,
@@ -31,7 +31,7 @@ where T: Sendable, T.AxisType: Sendable, T.PointType: Sendable, T.VectorType: Se
   
 }
 
-@usableFromInline func buildKDTree<T: PositionedEntity>(elements: inout [T], bounds: BoundingBox<T.PointType>, maxChildren: Int) -> TreeNode<T> {
+@usableFromInline @inline(__always) func buildKDTree<T: PositionedEntity>(elements: inout [T], bounds: BoundingBox<T.PointType>, maxChildren: Int) -> TreeNode<T> {
   if elements.count < maxChildren {
     return TreeNode((elements, bounds))
   }

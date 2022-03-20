@@ -5,15 +5,15 @@
 //  Created by Oliver Hunt on 3/8/22.
 //
 
-@usableFromInline internal protocol PriorityComparator {
+public protocol PriorityComparator {
   associatedtype ValueType
   static func value(_ left: ValueType, isLessThan right: ValueType) -> Bool
 }
 
-@usableFromInline internal struct ClampedPriorityHeap<T, Comparator: PriorityComparator> where Comparator.ValueType == T {
+@frozen public struct ClampedPriorityHeap<T, Comparator: PriorityComparator> where Comparator.ValueType == T {
   @usableFromInline var maxSize : Int
   @usableFromInline var data : [T]
-  @inlinable init(maxSize: Int){
+  @inlinable @inline(__always) init(maxSize: Int){
     self.maxSize = maxSize
     data = [T]()
     data.reserveCapacity(maxSize)

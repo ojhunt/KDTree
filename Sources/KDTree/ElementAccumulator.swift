@@ -17,11 +17,11 @@ import Foundation
     
     
   }
-  @usableFromInline var heap: ClampedPriorityHeap<(T, DistanceType), DistanceComparator>?
-  @usableFromInline var data = [(T, DistanceType)]()
-  @usableFromInline let maxCount: Int
-  @usableFromInline var count: Int = 0
-  @usableFromInline var topIndex: Int = -1
+  @usableFromInline @inline(__always) var heap: ClampedPriorityHeap<(T, DistanceType), DistanceComparator>?
+  @usableFromInline @inline(__always) var data = [(T, DistanceType)]()
+  @usableFromInline @inline(__always) let maxCount: Int
+  @usableFromInline @inline(__always) var count: Int = 0
+  @usableFromInline @inline(__always) var topIndex: Int = -1
   @usableFromInline @inline(__always) init(maxCount: Int) {
     self.maxCount = maxCount
     heap = nil;

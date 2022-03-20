@@ -11,7 +11,7 @@ import Foundation
   case Equal
   case Greater
 }
-@usableFromInline func select<T>(_ array: inout [T], kth k: Int, left l: Int, right r: Int, by compare: (T, T) -> CompareResult) -> T {
+@usableFromInline @inline(__always) func select<T>(_ array: inout [T], kth k: Int, left l: Int, right r: Int, by compare: (T, T) -> CompareResult) -> T {
   var left = l
   var right = r
   while right > left {
