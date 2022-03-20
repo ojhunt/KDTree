@@ -26,7 +26,7 @@ public protocol PriorityComparator {
   @usableFromInline @inline(__always) var top : T? {
     return data.first
   }
-  
+
   @usableFromInline mutating func pop() -> T? {
     guard let result = data.first else { return nil }
 
@@ -39,28 +39,31 @@ public protocol PriorityComparator {
     data[0] = temp;
     var currentIndex = 0;
     let end = data.count - 1
-    while currentIndex * 2 < end {
-      let leftChildIndex = currentIndex * 2 + 1;
-      let rightChildIndex = currentIndex * 2 + 2;
-      
-      let left = data[leftChildIndex];
-      if rightChildIndex == data.count {
-        if Comparator.value(temp, isLessThan: left) {
-          data.swapAt(currentIndex, leftChildIndex);
+    let count = data.count
+    return data.withContiguousMutableStorageIfAvailable { ptr in
+      let buffer = ptr.baseAddress!
+      while currentIndex * 2 < end {
+        let leftChildIndex = currentIndex * 2 + 1;
+        let rightChildIndex = currentIndex * 2 + 2;
+        let left = buffer.advanced(by: ptr.startIndex + leftChildIndex);
+        if rightChildIndex == count {
+          if Comparator.value(temp, isLessThan: left.pointee) {
+            ptr.swapAt(currentIndex, leftChildIndex);
+          }
+          return result;
         }
-        return result;
+        
+        let right = buffer.advanced(by: ptr.startIndex + rightChildIndex);
+        if Comparator.value(left.pointee, isLessThan: temp) && Comparator.value(right.pointee, isLessThan: temp) {
+          return result;
+        }
+        
+        let greaterIndex = Comparator.value(left.pointee, isLessThan: right.pointee) ? rightChildIndex : leftChildIndex;
+        ptr.swapAt(currentIndex, greaterIndex);
+        currentIndex = greaterIndex;
       }
-      
-      let right = data[rightChildIndex];
-      if Comparator.value(left, isLessThan: temp) && Comparator.value(right, isLessThan: temp) {
-        return result;
-      }
-      
-      let greaterIndex = Comparator.value(left, isLessThan: right) ? rightChildIndex : leftChildIndex;
-      data.swapAt(currentIndex, greaterIndex);
-      currentIndex = greaterIndex;
+      return result;
     }
-    return result;
   }
 
   @inlinable mutating func internalInsert(_ new: T) {
