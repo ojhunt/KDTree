@@ -9,7 +9,7 @@ import Foundation
 import VectorTypes
 
 public final class KDTree<T: PositionedEntity> where T.PointType.ValueType: Rootable {
-  @usableFromInline typealias DistanceType = T.PointType.ValueType
+  public typealias DistanceType = T.PointType.ValueType
   @usableFromInline let root: TreeNode<T>
   
   public init(elements: inout [T], maxChildren: Int) {
