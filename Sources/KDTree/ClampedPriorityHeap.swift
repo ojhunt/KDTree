@@ -12,13 +12,13 @@ public protocol PriorityComparator {
 
 @frozen public struct ClampedPriorityHeap<T, Comparator: PriorityComparator> where Comparator.ValueType == T {
   @usableFromInline var maxSize : Int
-  @usableFromInline var data : [T]
+  @usableFromInline var data : ContiguousArray<T>
   @inlinable @inline(__always) init(maxSize: Int){
     self.maxSize = maxSize
-    data = [T]()
+    data = ContiguousArray()
     data.reserveCapacity(maxSize)
   }
-  @usableFromInline @inline(__always) mutating func append(contentsOf buffer: [T]) {
+  @usableFromInline @inline(__always) mutating func append(contentsOf buffer: ContiguousArray<T>) {
     for t in buffer {
       insert(t)
     }

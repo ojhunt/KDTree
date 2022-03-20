@@ -25,7 +25,7 @@ extension Double: Rootable {
     leafChildren = []
     leafBounds = BoundingBox()
   }
-  @usableFromInline init(_ leaf: ([T], BoundingBox<T.PointType>)) {
+  @usableFromInline init(_ leaf: (ContiguousArray<T>, BoundingBox<T.PointType>)) {
     leafChildren = leaf.0;
     leafBounds = leaf.1
     isLeaf = true
@@ -33,17 +33,17 @@ extension Double: Rootable {
   }
   @usableFromInline @inline(__always) let innerNode: InnerNode<T>?
   @usableFromInline @inline(__always) let isLeaf: Bool
-  @usableFromInline @inline(__always) let leafChildren: [T]
+  @usableFromInline @inline(__always) let leafChildren: ContiguousArray<T>
   @usableFromInline @inline(__always) let leafBounds: BoundingBox<T.PointType>
   @_effects(releasenone) @usableFromInline @inline(__always) func nearest(
     position: T.PointType,
     maxCount: Int,
     maxDistance: DistanceType,
     filter: ((T)->DistanceType?)?
-  ) -> [(T, DistanceType)]? {
+  ) -> ContiguousArray<(T, DistanceType)>? {
     let maxSquaredDistance = maxDistance * maxDistance
     var nearestElements = ElementAccumulator<T, DistanceType>(maxCount: maxCount)
-    var stack : [Unmanaged<TreeNode<T>>] = [.passUnretained(self)];
+    var stack : ContiguousArray<Unmanaged<TreeNode<T>>> = [.passUnretained(self)];
     stack_loop: while !stack.isEmpty {
       let top = stack.removeLast()
       if top._withUnsafeGuaranteedRef({top in top.isLeaf}) {
@@ -124,7 +124,6 @@ extension Double: Rootable {
           }
         }
       } else {
-
         if let farthestChild = farthestChild {
           if position[nodeAxis] - distance <= nodeValue {
             stack.append(farthestChild);

@@ -242,7 +242,7 @@ final class KDTreeTests: XCTestCase {
       if a > b { return .Greater }
       return .Equal
     }
-    var array = [5,2,1,0,4,3,6,7,8,9,10,11,12].shuffled()
+    var array = ContiguousArray([5,2,1,0,4,3,6,7,8,9,10,11,12].shuffled())
     XCTAssertEqual(select(&array, kth: 0, by: comparator), 0);
     array.shuffle()
     XCTAssertEqual(select(&array, kth: 5, by: comparator), 5);
@@ -268,7 +268,7 @@ final class KDTreeTests: XCTestCase {
   }
   func test_buildComplete() {
     let range = Float(-100.0)..<Float(100.0)
-    var points = [TestElement2D]()
+    var points = ContiguousArray<TestElement2D>()
     for i in 0..<1000 {
       points.append(TestElement2D(position: TestPoint2D(x: Float.random(in: range), y: Float.random(in: range)), id: i))
     }
@@ -281,7 +281,7 @@ final class KDTreeTests: XCTestCase {
   }
   func searchInteral(maxCount: Int, maxDistance: Float, filter: ((TestElement2D)->Float?)?) {
     let range = Float(-100.0)..<Float(100.0)
-    var points = [TestElement2D]()
+    var points = ContiguousArray<TestElement2D>()
     for i in 0..<1000 {
       points.append(TestElement2D(position: TestPoint2D(x: Float.random(in: range), y: Float.random(in: range)), id: i))
     }

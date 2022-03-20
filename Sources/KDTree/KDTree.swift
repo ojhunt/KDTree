@@ -12,7 +12,7 @@ import VectorTypes
   public typealias DistanceType = T.PointType.ValueType
   @usableFromInline let root: TreeNode<T>
   
-  @inlinable @inline(__always) public init(elements: inout [T], maxChildren: Int) {
+  @inlinable @inline(__always) public init(elements: inout ContiguousArray<T>, maxChildren: Int) {
     let bounds = elements.reduce(BoundingBox(), { result, element in return result.merge(point:element.position)})
     root = buildKDTree(elements: &elements, bounds: bounds, maxChildren: maxChildren)
   }
@@ -21,7 +21,7 @@ import VectorTypes
     maxCount: Int,
     maxDistance: DistanceType,
     filter: ((T)->DistanceType?)? = nil
-  ) -> [(T, T.PointType.ValueType)]? {
+  ) -> ContiguousArray<(T, T.PointType.ValueType)>? {
     return root.nearest(position: position, maxCount: maxCount, maxDistance: maxDistance, filter: filter);
   }
 }
@@ -31,7 +31,7 @@ where T: Sendable, T.AxisType: Sendable, T.PointType: Sendable, T.VectorType: Se
   
 }
 
-@_effects(releasenone) @usableFromInline @inline(__always) func buildKDTree<T: PositionedEntity>(elements: inout [T], bounds: BoundingBox<T.PointType>, maxChildren: Int) -> TreeNode<T> {
+@_effects(releasenone) @usableFromInline @inline(__always) func buildKDTree<T: PositionedEntity>(elements: inout ContiguousArray<T>, bounds: BoundingBox<T.PointType>, maxChildren: Int) -> TreeNode<T> {
   if elements.count < maxChildren {
     return TreeNode((elements, bounds))
   }
@@ -46,8 +46,8 @@ where T: Sendable, T.AxisType: Sendable, T.PointType: Sendable, T.VectorType: Se
   })
   let splitValue = elements[halfPoint].position[maxAxis];
   
-  var left : [T] = elements[0..<halfPoint].map({a in a})
-  var right : [T] = elements[halfPoint..<elements.count].map({a in a})
+  var left = ContiguousArray(elements[0..<halfPoint])
+  var right = ContiguousArray(elements[halfPoint..<elements.count])
   assert(left.last!.position[maxAxis] <= right.last!.position[maxAxis])
   assert(left.first!.position[maxAxis] <= right.first!.position[maxAxis])
   let leftBounds = left.reduce(BoundingBox(), { result, element in return result.merge(point:element.position)})
