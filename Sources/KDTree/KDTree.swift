@@ -80,7 +80,7 @@ public typealias IterableAxis = VectorTypes.IterableAxis
 public final class KDTree<T: PositionedEntity> {
   @usableFromInline let root: TreeNode<T>
   
-  init(elements: inout [T], maxChildren: Int) {
+  public init(elements: inout [T], maxChildren: Int) {
     let bounds = elements.reduce(BoundingBox(), { result, element in return result.merge(point:element.position)})
     root = buildKDTree(elements: &elements, bounds: bounds, maxChildren: maxChildren)
   }
