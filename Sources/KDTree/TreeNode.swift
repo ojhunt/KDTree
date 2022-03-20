@@ -35,7 +35,6 @@ extension Double: Rootable {
   @usableFromInline @inline(__always) let isLeaf: Bool
   @usableFromInline @inline(__always) let leafChildren: [T]
   @usableFromInline @inline(__always) let leafBounds: BoundingBox<T.PointType>
-
   @usableFromInline @inline(__always) func nearest(
     position: T.PointType,
     maxCount: Int,

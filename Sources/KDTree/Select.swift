@@ -12,7 +12,6 @@ import Foundation
   case Greater
 }
 
-@_assemblyVision
 @usableFromInline @inline(__always) func select<T>(_ array: inout [T], kth k: Int, left l: Int, right r: Int, by compare: (T, T) -> CompareResult) -> T {
   var left = l
   var right = r
