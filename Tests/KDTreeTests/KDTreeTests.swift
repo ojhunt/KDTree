@@ -1,4 +1,6 @@
 import XCTest
+import VectorTypes
+
 @testable import KDTree
 
 struct IntComparator : PriorityComparator{
@@ -27,6 +29,86 @@ struct TestMask2D : Mask {
   typealias AxisType = TestAxis2D
 }
 struct TestVector2D : Vector {
+  static prefix func - (right: TestVector2D) -> TestVector2D {
+    return TestVector2D(x: -right.x, y: -right.y)
+  }
+  
+  static func + (left: TestVector2D, right: TestVector2D) -> TestVector2D {
+    return TestVector2D(x: left.x + right.x, y: left.y + right.y)
+  }
+  
+  static func - (left: TestVector2D, right: TestVector2D) -> TestVector2D {
+    return TestVector2D(x: left.x - right.x, y: left.y - right.y)
+  }
+  
+  func length() -> Float {
+    return squaredLength().squareRoot()
+  }
+  
+  func replace(with other: TestVector2D, where c: TestMask2D) -> TestVector2D {
+    return TestVector2D(x: c.x ? other.x : x, y: c.y ? other.y : y)
+  }
+  
+  func minElement() -> Float {
+    return Swift.min(x, y)
+  }
+  
+  func maxElement() -> Float {
+    return Swift.max(x, y)
+  }
+  
+  static func random() -> TestVector2D {
+    return random(1)
+  }
+  
+  static func random(_ radius: Float) -> TestVector2D {
+    while true {
+      let x = Float.random(in: -radius...radius)
+      let y = Float.random(in: -radius...radius)
+      if x*x+y*y <= 1 {
+        return TestVector2D(x: x, y: y)
+      }
+    }
+  }
+  
+  static func * (left: TestVector2D, right: Float) -> TestVector2D {
+    return TestVector2D(x: left.x * right, y: left.y * right)
+  }
+  
+  static func * (left: Float, right: TestVector2D) -> TestVector2D {
+    return TestVector2D(x: right.x * left, y: right.y * left)
+  }
+  
+  static func / (left: TestVector2D, right: Float) -> TestVector2D {
+    return TestVector2D(x: left.x / right, y: left.y / right)
+  }
+  
+  static func .* (left: TestVector2D, right: TestVector2D) -> TestVector2D {
+    return TestVector2D(x: left.x * right.x, y: left.y * right.y )
+  }
+  
+  static func ./ (left: TestVector2D, right: TestVector2D) -> TestVector2D {
+    return TestVector2D(x: left.x / right.x, y: left.y / right.y )
+  }
+  
+  static func .< (left: TestVector2D, right: TestVector2D) -> TestMask2D {
+    return TestMask2D(x: left.x < right.x, y: left.y < right.y )
+  }
+  
+  static func .> (left: TestVector2D, right: TestVector2D) -> TestMask2D {
+    return TestMask2D(x: left.x > right.x, y: left.y > right.y )
+  }
+  
+  static func max(_ left: TestVector2D, _ right: TestVector2D) -> TestVector2D {
+    return TestVector2D(x: Swift.max(left.x, right.x), y: Swift.max(left.y, right.y))
+  }
+  
+  static func min(_ left: TestVector2D, _ right: TestVector2D) -> TestVector2D {
+    return TestVector2D(x: Swift.min(left.x, right.x), y: Swift.min(left.y, right.y))
+  }
+  
+  typealias MaskType = TestMask2D
+  
   internal init(x: Float, y: Float) {
     self.x = x
     self.y = y
@@ -161,17 +243,17 @@ final class KDTreeTests: XCTestCase {
       return .Equal
     }
     var array = [5,2,1,0,4,3,6,7,8,9,10,11,12].shuffled()
-    XCTAssertEqual(select(array: &array, kth: 0, by: comparator), 0);
+    XCTAssertEqual(select(&array, kth: 0, by: comparator), 0);
     array.shuffle()
-    XCTAssertEqual(select(array: &array, kth: 5, by: comparator), 5);
+    XCTAssertEqual(select(&array, kth: 5, by: comparator), 5);
     array.shuffle()
-    XCTAssertEqual(select(array: &array, kth: 1, by: comparator), 1);
+    XCTAssertEqual(select(&array, kth: 1, by: comparator), 1);
     array.shuffle()
-    XCTAssertEqual(select(array: &array, kth: 2, by: comparator), 2);
+    XCTAssertEqual(select(&array, kth: 2, by: comparator), 2);
     array.shuffle()
-    XCTAssertEqual(select(array: &array, kth: 3, by: comparator), 3);
+    XCTAssertEqual(select(&array, kth: 3, by: comparator), 3);
     array.shuffle()
-    XCTAssertEqual(select(array: &array, kth: 4, by: comparator), 4);
+    XCTAssertEqual(select(&array, kth: 4, by: comparator), 4);
     
   }
   struct TestElement2D : PositionedEntity, Equatable {
@@ -197,7 +279,7 @@ final class KDTreeTests: XCTestCase {
     XCTAssertEqual(TestVector2D(x: 0, y: 1).squaredLength(), 1.0)
     XCTAssertEqual(TestVector2D(x: 1, y: 1).squaredLength(), 2.0)
   }
-  func searchInteral(maxDistance: Float, filter: ((TestElement2D)->Bool)?) {
+  func searchInteral(maxCount: Int, maxDistance: Float, filter: ((TestElement2D)->Float?)?) {
     let range = Float(-100.0)..<Float(100.0)
     var points = [TestElement2D]()
     for i in 0..<1000 {
@@ -205,34 +287,41 @@ final class KDTreeTests: XCTestCase {
     }
     let tree = KDTree(elements: &points, maxChildren: 8)
     let position = TestPoint2D(x: Float.random(in: range), y: Float.random(in: range))
-    let nearest = tree.nearest(position: position, maxCount: 50, maxDistanceSquared: maxDistance, filter: filter)?.sorted(by: { $0.1 < $1.1}).map({ $0.0 }) ?? []
-    var truePointAndDistance = [TestPair]()
-    for point in points {
-      let distance = (point.position - position).squaredLength()
-      if let filter = filter {
-        if !filter(point) {
-          continue
+    let nearest = tree.nearest(position: position, maxCount: maxCount, maxDistance: maxDistance, filter: filter)?.sorted(by: { $0.1 < $1.1}).map({ $0.0 }) ?? []
+    let maxSquaredDistance = maxDistance * maxDistance
+    var accumulator = ElementAccumulator<TestElement2D, Float>(maxCount: maxCount)
+    for element in points {
+      guard let filter = filter else {
+        let distance = (element.position - position).squaredLength()
+        if (distance < maxSquaredDistance) {
+          accumulator.insert((element, distance));
         }
+        return;
       }
-      truePointAndDistance.append(TestPair(value: point, distance: distance))
+      guard let distance = filter(element) else { return }
+      if (distance < maxDistance) {
+        accumulator.insert((element, distance));
+      }
     }
-    let sortedPoints = truePointAndDistance.filter({ elem in
-      elem.distance < maxDistance
-    }).sorted(by: { $0.distance < $1.distance})[0..<nearest.count].map({$0.value})
-    
+    let sortedPoints = accumulator.getData().sorted(by: { $0.1 < $1.1}).map({ $0.0 })
     XCTAssertEqual(nearest, sortedPoints)
   }
   
   func test_basicSearch() {
-    searchInteral(maxDistance: Float.infinity, filter: nil)
+    searchInteral(maxCount: 50, maxDistance: Float.infinity, filter: nil)
   }
   func test_boundSearch() {
-    searchInteral(maxDistance: 5, filter: nil)
+    searchInteral(maxCount: 50, maxDistance: 5, filter: nil)
   }
   
   func test_filteredSearch() {
-    searchInteral(maxDistance: Float.infinity) { element in
-      return element.id.isMultiple(of: 2)
+    let origin = TestPoint2D(x: 0, y: 0)
+    searchInteral(maxCount: 50, maxDistance: Float.infinity) { element in
+      if element.id.isMultiple(of: 2) {
+        return nil
+      } else {
+        return (element.position - origin).length()
+      }
     }
   }
 }

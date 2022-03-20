@@ -1,8 +1,8 @@
 //
 //  ClampedPriorityHeap.swift
-//  
+//  Oliver's KDTree
 //
-//  Created by Oliver Hunt on 3/19/22.
+//  Created by Oliver Hunt on 3/8/22.
 //
 
 @usableFromInline internal protocol PriorityComparator {
