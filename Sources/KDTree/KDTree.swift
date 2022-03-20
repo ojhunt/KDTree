@@ -12,7 +12,7 @@ import VectorTypes
   public typealias DistanceType = T.PointType.ValueType
   @usableFromInline let root: TreeNode<T>
   
-  public init(elements: inout [T], maxChildren: Int) {
+  @inlinable @inline(__always) public init(elements: inout [T], maxChildren: Int) {
     let bounds = elements.reduce(BoundingBox(), { result, element in return result.merge(point:element.position)})
     root = buildKDTree(elements: &elements, bounds: bounds, maxChildren: maxChildren)
   }
@@ -31,7 +31,7 @@ where T: Sendable, T.AxisType: Sendable, T.PointType: Sendable, T.VectorType: Se
   
 }
 
-@usableFromInline @inline(__always) func buildKDTree<T: PositionedEntity>(elements: inout [T], bounds: BoundingBox<T.PointType>, maxChildren: Int) -> TreeNode<T> {
+@_effects(readnone) @usableFromInline @inline(__always) func buildKDTree<T: PositionedEntity>(elements: inout [T], bounds: BoundingBox<T.PointType>, maxChildren: Int) -> TreeNode<T> {
   if elements.count < maxChildren {
     return TreeNode((elements, bounds))
   }

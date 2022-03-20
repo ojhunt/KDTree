@@ -9,7 +9,7 @@ import Foundation
 
 @usableFromInline internal struct ElementAccumulator<T, DistanceType: Comparable> {
   @usableFromInline struct DistanceComparator: PriorityComparator {
-    @usableFromInline static func value(_ left: (T, DistanceType), isLessThan right: (T, DistanceType)) -> Bool {
+    @_effects(readnone) @inline(__always) @usableFromInline static func value(_ left: (T, DistanceType), isLessThan right: (T, DistanceType)) -> Bool {
       return left.1 < right.1
     }
     

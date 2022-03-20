@@ -12,6 +12,7 @@ import Foundation
   case Greater
 }
 
+@_effects(readnone)
 @usableFromInline @inline(__always) func select<T>(_ array: inout [T], kth k: Int, left l: Int, right r: Int, by compare: (T, T) -> CompareResult) -> T {
   var left = l
   var right = r
@@ -69,6 +70,7 @@ import Foundation
   return array[k]
 }
 
+@_effects(readnone)
 @inlinable @inline(__always) func select<T>(_ array: inout [T], kth: Int, by areInIncreasingOrder: (T, T) -> CompareResult) -> T {
   return select(&array, kth: kth, left: 0, right: array.count - 1, by: areInIncreasingOrder)
 }

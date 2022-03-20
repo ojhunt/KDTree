@@ -8,7 +8,7 @@
 import VectorTypes
 
 @usableFromInline final class InnerNode<T: PositionedEntity> where T.PointType.ValueType: Rootable {
-  internal init(children: (TreeNode<T>, TreeNode<T>), axis: T.AxisType, value: T.PointType.ValueType, bounds: BoundingBox<T.PointType>) {
+  @inlinable @inline(__always) init(children: (TreeNode<T>, TreeNode<T>), axis: T.AxisType, value: T.PointType.ValueType, bounds: BoundingBox<T.PointType>) {
     leftChild = children.0
     rightChild = children.1
     self.axis = axis
