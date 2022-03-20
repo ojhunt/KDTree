@@ -31,7 +31,7 @@ where T: Sendable, T.AxisType: Sendable, T.PointType: Sendable, T.VectorType: Se
   
 }
 
-@_effects(readnone) @usableFromInline @inline(__always) func buildKDTree<T: PositionedEntity>(elements: inout [T], bounds: BoundingBox<T.PointType>, maxChildren: Int) -> TreeNode<T> {
+@_effects(releasenone) @usableFromInline @inline(__always) func buildKDTree<T: PositionedEntity>(elements: inout [T], bounds: BoundingBox<T.PointType>, maxChildren: Int) -> TreeNode<T> {
   if elements.count < maxChildren {
     return TreeNode((elements, bounds))
   }
