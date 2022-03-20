@@ -12,11 +12,11 @@ public final class KDTree<T: PositionedEntity> where T.PointType.ValueType: Root
   @usableFromInline typealias DistanceType = T.PointType.ValueType
   @usableFromInline let root: TreeNode<T>
   
-  init(elements: inout [T], maxChildren: Int) {
+  public init(elements: inout [T], maxChildren: Int) {
     let bounds = elements.reduce(BoundingBox(), { result, element in return result.merge(point:element.position)})
     root = buildKDTree(elements: &elements, bounds: bounds, maxChildren: maxChildren)
   }
-  @inlinable func nearest(
+  @inlinable public func nearest(
     position: T.PointType,
     maxCount: Int,
     maxDistance: DistanceType,
