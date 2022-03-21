@@ -19,6 +19,8 @@ public protocol PriorityComparator {
     data.reserveCapacity(maxSize)
   }
   @usableFromInline @inline(__always) mutating func append(contentsOf buffer: ContiguousArray<T>) {
+    // There are linear ways to set up a valid heap layout but i'm lazy, and
+    // Swift's obnxious overheads are currently dwarving all other costs
     for t in buffer {
       insert(t)
     }

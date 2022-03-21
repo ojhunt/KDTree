@@ -21,7 +21,7 @@ import VectorTypes
     maxCount: Int,
     maxDistance: DistanceType,
     filter: ((T)->DistanceType?)? = nil
-  ) -> ContiguousArray<(T, T.PointType.ValueType)>? {
+  ) -> ContiguousArray<NonTupleType<T, T.PointType.ValueType>>? {
     return root.nearest(position: position, maxCount: maxCount, maxDistance: maxDistance, filter: filter);
   }
 }

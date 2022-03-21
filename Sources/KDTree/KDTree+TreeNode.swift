@@ -40,7 +40,7 @@ extension KDTree {
       maxCount: Int,
       maxDistance: DistanceType,
       filter: ((T)->DistanceType?)?
-    ) -> ContiguousArray<(T, DistanceType)>? {
+    ) -> ContiguousArray<NonTupleType<T, DistanceType>>? {
       let maxSquaredDistance = maxDistance * maxDistance
       var nearestElements = ElementAccumulator<T, DistanceType>(maxCount: maxCount)
       let theSelf = Unmanaged<TreeNode>.passUnretained(self).toOpaque()
@@ -52,7 +52,7 @@ extension KDTree {
             top.bounds
           }
           if nearestElements.isFull {
-            let distance = T.VectorType(repeating: nearestElements.sortedTop!.1);
+            let distance = T.VectorType(repeating: nearestElements.sortedTop!.distance);
             let min = bounds.minBound - distance;
             let max = bounds.maxBound + distance;
             if (position .< min).any || (position .> max).any {
@@ -65,13 +65,13 @@ extension KDTree {
                 guard let filter = filter else {
                   let distance = (element.position - position).squaredLength()
                   if (distance < maxSquaredDistance) {
-                    nearestElements.insert((element, distance));
+                    nearestElements.insert(NonTupleType(element, distance));
                   }
                   return;
                 }
                 guard let distance = filter(element) else { return }
                 if (distance < maxDistance) {
-                  nearestElements.insert((element, distance));
+                  nearestElements.insert(NonTupleType(element, distance));
                 }
               }
             }
@@ -113,7 +113,7 @@ extension KDTree {
           stack.append(nearestChild.toOpaque())
           continue stack_loop;
         }
-        guard let distance = nearestElements.sortedTop?.1 else { fatalError() }
+        guard let distance = nearestElements.sortedTop?.distance else { fatalError() }
         let bounds = node._withUnsafeGuaranteedRef({ node in node.bounds });
         let min = bounds.minBound - T.VectorType(repeating: Swift.min(distance, maxDistance));
         let max = bounds.maxBound + T.VectorType(repeating: Swift.min(distance, maxDistance));

@@ -287,23 +287,23 @@ final class KDTreeTests: XCTestCase {
     }
     let tree = KDTree(elements: &points, maxChildren: 8)
     let position = TestPoint2D(x: Float.random(in: range), y: Float.random(in: range))
-    let nearest = tree.nearest(position: position, maxCount: maxCount, maxDistance: maxDistance, filter: filter)?.sorted(by: { $0.1 < $1.1}).map({ $0.0 }) ?? []
+    let nearest = tree.nearest(position: position, maxCount: maxCount, maxDistance: maxDistance, filter: filter)?.sorted(by: { $0.distance < $1.distance}).map({ $0.element }) ?? []
     let maxSquaredDistance = maxDistance * maxDistance
     var accumulator = ElementAccumulator<TestElement2D, Float>(maxCount: maxCount)
     for element in points {
       guard let filter = filter else {
         let distance = (element.position - position).squaredLength()
         if (distance < maxSquaredDistance) {
-          accumulator.insert((element, distance));
+          accumulator.insert(NonTupleType(element, distance));
         }
         continue;
       }
       guard let distance = filter(element) else { return }
       if (distance < maxDistance) {
-        accumulator.insert((element, distance));
+        accumulator.insert(NonTupleType(element, distance));
       }
     }
-    let sortedPoints = accumulator.getData().sorted(by: { $0.1 < $1.1}).map({ $0.0 })
+    let sortedPoints = accumulator.getData().sorted(by: { $0.distance < $1.distance}).map({ $0.element })
     XCTAssertEqual(nearest, sortedPoints)
   }
   
