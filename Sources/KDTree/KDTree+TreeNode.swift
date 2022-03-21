@@ -67,7 +67,7 @@ extension KDTree {
                   if (distance < maxSquaredDistance) {
                     nearestElements.insert(NonTupleType(element, distance));
                   }
-                  return;
+                  continue;
                 }
                 guard let distance = filter(element) else { return }
                 if (distance < maxDistance) {

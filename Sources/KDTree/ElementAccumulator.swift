@@ -6,14 +6,14 @@
 //
 
 import Foundation
-public struct NonTupleType<Element, Distance> {
-  internal init(_ element: Element, _ distance: Distance) {
+@frozen public struct NonTupleType<Element, Distance> {
+  @inline(__always) @usableFromInline internal init(_ element: Element, _ distance: Distance) {
     self.element = element
     self.distance = distance
   }
   
-  public let element: Element
-  public let distance: Distance
+  @inline(__always) public let element: Element
+  @inline(__always) public let distance: Distance
 }
 
 @usableFromInline internal struct ElementAccumulator<T, DistanceType: Comparable> {
