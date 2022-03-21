@@ -58,17 +58,21 @@ extension KDTree {
               continue stack_loop;
             }
           }
-          top._withUnsafeGuaranteedRef({ top in top.leafChildren }).forEach { element in
-            guard let filter = filter else {
-              let distance = (element.position - position).squaredLength()
-              if (distance < maxSquaredDistance) {
-                nearestElements.insert((element, distance));
+          top._withUnsafeGuaranteedRef { top in
+            top.leafChildren.withContiguousStorageIfAvailable { buffer in
+              for element in buffer {
+                guard let filter = filter else {
+                  let distance = (element.position - position).squaredLength()
+                  if (distance < maxSquaredDistance) {
+                    nearestElements.insert((element, distance));
+                  }
+                  return;
+                }
+                guard let distance = filter(element) else { return }
+                if (distance < maxDistance) {
+                  nearestElements.insert((element, distance));
+                }
               }
-              return;
-            }
-            guard let distance = filter(element) else { return }
-            if (distance < maxDistance) {
-              nearestElements.insert((element, distance));
             }
           }
           continue stack_loop;
