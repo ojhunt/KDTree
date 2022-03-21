@@ -10,7 +10,7 @@ import VectorTypes
 
 @frozen public struct KDTree<T: PositionedEntity> where T.PointType.ValueType: Rootable {
   public typealias DistanceType = T.PointType.ValueType
-  @usableFromInline let root: TreeNode<T>
+  @usableFromInline let root: TreeNode
   
   @inlinable @inline(__always) public init(elements: inout ContiguousArray<T>, maxChildren: Int) {
     let bounds = elements.reduce(BoundingBox(), { result, element in return result.merge(point:element.position)})
@@ -31,9 +31,9 @@ where T: Sendable, T.AxisType: Sendable, T.PointType: Sendable, T.VectorType: Se
   
 }
 
-@_effects(releasenone) @usableFromInline @inline(__always) func buildKDTree<T: PositionedEntity>(elements: inout ContiguousArray<T>, bounds: BoundingBox<T.PointType>, maxChildren: Int) -> TreeNode<T> {
+@_effects(releasenone) @usableFromInline @inline(__always) func buildKDTree<T: PositionedEntity>(elements: inout ContiguousArray<T>, bounds: BoundingBox<T.PointType>, maxChildren: Int) -> KDTree<T>.TreeNode {
   if elements.count < maxChildren {
-    return TreeNode((elements, bounds))
+    return KDTree<T>.TreeNode((elements, bounds))
   }
   let maxAxis = bounds.maxAxis()
   let halfPoint = elements.count / 2
@@ -54,5 +54,5 @@ where T: Sendable, T.AxisType: Sendable, T.PointType: Sendable, T.VectorType: Se
   let rightBounds = right.reduce(BoundingBox(), { result, element in return result.merge(point:element.position)})
   let leftNode = buildKDTree(elements: &left, bounds: leftBounds, maxChildren: maxChildren)
   let rightNode = buildKDTree(elements: &right, bounds: rightBounds, maxChildren: maxChildren)
-  return TreeNode(InnerNode(children:(leftNode, rightNode), axis: maxAxis, value:splitValue, bounds:bounds))
+  return KDTree<T>.TreeNode(KDTree<T>.InteriorNode(children:(leftNode, rightNode), axis: maxAxis, value:splitValue, bounds:bounds))
 }
