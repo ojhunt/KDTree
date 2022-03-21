@@ -43,9 +43,10 @@ extension KDTree {
     ) -> ContiguousArray<(T, DistanceType)>? {
       let maxSquaredDistance = maxDistance * maxDistance
       var nearestElements = ElementAccumulator<T, DistanceType>(maxCount: maxCount)
-      var stack : ContiguousArray<Unmanaged<TreeNode>> = [.passUnretained(self)];
+      let theSelf = Unmanaged<TreeNode>.passUnretained(self).toOpaque()
+      var stack : ContiguousArray<UnsafeMutableRawPointer> = [theSelf];
       stack_loop: while !stack.isEmpty {
-        let top = stack.removeLast()
+        let top: Unmanaged<TreeNode> = .fromOpaque(stack.removeLast())
         if top._withUnsafeGuaranteedRef({top in top.isLeaf}) {
           let bounds = top._withUnsafeGuaranteedRef { top in
             top.bounds
@@ -107,9 +108,9 @@ extension KDTree {
         if !nearestElements.isFull {
           // we push the farthest first so we visit it second
           if let farthestChild = farthestChild {
-            stack.append(farthestChild)
+            stack.append(farthestChild.toOpaque())
           }
-          stack.append(nearestChild)
+          stack.append(nearestChild.toOpaque())
           continue stack_loop;
         }
         guard let distance = nearestElements.sortedTop?.1 else { fatalError() }
@@ -124,18 +125,18 @@ extension KDTree {
           if let farthestChild = farthestChild {
             
             if position[nodeAxis] + distance >= nodeValue {
-              stack.append(farthestChild);
+              stack.append(farthestChild.toOpaque());
             }
           }
         } else {
           if let farthestChild = farthestChild {
             if position[nodeAxis] - distance <= nodeValue {
-              stack.append(farthestChild);
+              stack.append(farthestChild.toOpaque());
             }
           }
         }
 
-        stack.append(nearestChild);
+        stack.append(nearestChild.toOpaque());
       }
       if nearestElements.isEmpty {
         return nil
