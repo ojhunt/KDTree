@@ -296,7 +296,7 @@ final class KDTreeTests: XCTestCase {
         if (distance < maxSquaredDistance) {
           accumulator.insert((element, distance));
         }
-        return;
+        continue;
       }
       guard let distance = filter(element) else { return }
       if (distance < maxDistance) {
